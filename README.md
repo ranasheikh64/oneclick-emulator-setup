@@ -16,48 +16,71 @@ Developed by **Jronix-Software Solutions**.
 
 ---
 
-## 🛠 Prerequisites
+## 🚀 Quick Start (How to Run from GitHub)
 
-- UNIX-based system (macOS or Linux).
-- `curl` and `unzip` installed.
-- Java (JDK) installed (Java 17+ is recommended for Android development).
-- `git` installed.
+You can run this tool directly from GitHub on your machine. Choose your Operating System below:
 
-## 🚀 Installation & Usage
+### 🍎 macOS & 🐧 Linux
 
-1. **Clone the repository:**
+Open your terminal and run the following commands:
+
+```bash
+# 1. Clone the repository
+git clone https://github.com/ranasheikh64/oneclick-emulator-setup.git
+
+# 2. Enter the directory
+cd oneclick-emulator-setup
+
+# 3. Make the script executable
+chmod +x android-env
+
+# 4. Run the setup
+./android-env setup
+```
+*(Follow the on-screen prompts to select your modern Pixel device frame!)*
+
+### 🪟 Windows
+
+Since this is a Bash script, Windows users should run this using **WSL (Windows Subsystem for Linux)** or **Git Bash**.
+
+1. Open your **WSL Ubuntu** terminal (or Git Bash).
+2. Run the exact same commands as macOS/Linux:
    ```bash
    git clone https://github.com/ranasheikh64/oneclick-emulator-setup.git
    cd oneclick-emulator-setup
-   ```
-
-2. **Make the script executable:**
-   ```bash
    chmod +x android-env
-   ```
-
-3. **Run the Setup Command:**
-   ```bash
    ./android-env setup
    ```
-   *Follow the on-screen prompts to select your modern Pixel device frame.*
 
-4. **Start the Emulator:**
-   Once setup is complete, you can easily start your emulator anytime by running:
-   ```bash
-   ./android-env start
-   ```
+---
 
-## 🏥 Other Commands
+## 🎮 Usage Guide
 
-- **Check Environment Health:**
+Once you have run the setup command, you can use the CLI tool to manage your emulator:
+
+- **Start the Emulator:** (Boots up the phone with the frame you selected)
+  ```bash
+  ./android-env start
+  ```
+
+- **Check Environment Health:** (Verifies Java, SDK, and ADB are working)
   ```bash
   ./android-env doctor
   ```
-- **List Installed Emulators:**
+
+- **List Installed Emulators:** (Shows all virtual devices you've created)
   ```bash
   ./android-env list
   ```
+
+---
+
+## 🛠 Prerequisites
+
+If you run into issues, ensure you have the following installed on your system:
+- `curl` and `unzip` (Usually pre-installed on Mac/Linux)
+- Java (JDK 17+ is recommended)
+- `git`
 
 ---
 
