@@ -187,17 +187,17 @@ function do_setup() {
          echo -e "${GREEN}✓ AVD Created with $SKIN_NAME frame!${NC}"
     fi
 
-    echo -e "\nCreating Desktop Shortcut ($CUSTOM_NAME)..."
+    echo -e "\nCreating App Shortcut ($CUSTOM_NAME)..."
     if [[ "$OSTYPE" == "darwin"* ]]; then
-        # macOS App Shortcut
-        osacompile -e "do shell script \"$ANDROID_HOME/emulator/emulator -avd $AVD_NAME > /dev/null 2>&1 &\"" -o "$HOME/Desktop/$CUSTOM_NAME.app" > /dev/null 2>&1
-        echo -e "${GREEN}✓ Desktop App created at ~/Desktop/$CUSTOM_NAME.app${NC}"
+        # macOS App Shortcut (Saved in Applications for Spotlight indexing)
+        mkdir -p "$HOME/Applications"
+        APP_PATH="$HOME/Applications/$CUSTOM_NAME.app"
+        osacompile -e "do shell script \"$ANDROID_HOME/emulator/emulator -avd $AVD_NAME > /dev/null 2>&1 &\"" -o "$APP_PATH" > /dev/null 2>&1
+        echo -e "${GREEN}✓ App created at $APP_PATH (Searchable in Spotlight!)${NC}"
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
-        # Linux Desktop Shortcut
-        DESKTOP_FILE="$HOME/Desktop/$CUSTOM_NAME.desktop"
-        if [ ! -d "$HOME/Desktop" ]; then
-            DESKTOP_FILE="$HOME/.local/share/applications/$CUSTOM_NAME.desktop"
-        fi
+        # Linux Desktop Shortcut (Saved in applications folder for App Launcher)
+        mkdir -p "$HOME/.local/share/applications"
+        DESKTOP_FILE="$HOME/.local/share/applications/$CUSTOM_NAME.desktop"
         echo "[Desktop Entry]" > "$DESKTOP_FILE"
         echo "Version=1.0" >> "$DESKTOP_FILE"
         echo "Type=Application" >> "$DESKTOP_FILE"
@@ -205,13 +205,17 @@ function do_setup() {
         echo "Exec=$ANDROID_HOME/emulator/emulator -avd $AVD_NAME" >> "$DESKTOP_FILE"
         echo "Terminal=false" >> "$DESKTOP_FILE"
         chmod +x "$DESKTOP_FILE"
-        echo -e "${GREEN}✓ Desktop Shortcut created at $DESKTOP_FILE${NC}"
+        echo -e "${GREEN}✓ App Shortcut created at $DESKTOP_FILE (Searchable in App Launcher!)${NC}"
     elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
-        # Windows Batch Shortcut (Git Bash)
-        WIN_DESKTOP="$USERPROFILE/Desktop"
-        echo "@echo off" > "$WIN_DESKTOP/$CUSTOM_NAME.bat"
-        echo "start /B %LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe -avd $AVD_NAME > NUL 2>&1" >> "$WIN_DESKTOP/$CUSTOM_NAME.bat"
-        echo -e "${GREEN}✓ Windows Batch Shortcut created on Desktop${NC}"
+        # Windows Batch Shortcut (Saved in Start Menu Programs)
+        START_MENU="$APPDATA/Microsoft/Windows/Start Menu/Programs"
+        # Fallback to desktop if APPDATA is not resolved in bash properly
+        if [ ! -d "$START_MENU" ]; then
+            START_MENU="$USERPROFILE/Desktop"
+        fi
+        echo "@echo off" > "$START_MENU/$CUSTOM_NAME.bat"
+        echo "start /B %LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe -avd $AVD_NAME > NUL 2>&1" >> "$START_MENU/$CUSTOM_NAME.bat"
+        echo -e "${GREEN}✓ App Shortcut created in Start Menu (Searchable in Windows!)${NC}"
     fi
 
     echo -e "\n${YELLOW}Setup Complete! 🚀${NC}"
