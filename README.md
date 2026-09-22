@@ -72,9 +72,18 @@ Since this tool leverages bash scripts and command-line SDKs, Windows users shou
 
 ## 🎮 Usage Guide
 
-Once you have run the setup command, you can use the CLI tool to manage your emulator:
+Once you have run the setup command, you can launch your emulator in two ways:
 
-- **Start the Emulator:** (Boots up the phone with the frame you selected)
+### 1. The Magic Way (No Commands Needed! ✨)
+Since the tool automatically creates a native Desktop App for you during setup, you can launch your emulator exactly like a normal app! Just search for the name you gave it:
+- **macOS:** Open **Spotlight Search** (Cmd+Space) or Launchpad.
+- **Windows:** Open your **Start Menu**.
+- **Linux:** Open your **App Launcher**.
+
+### 2. Using the CLI Tool
+You can also use the script to manage your environment from the terminal:
+
+- **Start the Emulator:** (Boots up the phone)
   ```bash
   ./android-env start
   ```
