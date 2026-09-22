@@ -1,8 +1,19 @@
-# 🚀 OneClick Emulator Setup
+# 🚀 OneClick Android Emulator Setup
+
+![macOS](https://img.shields.io/badge/macOS-000000?style=for-the-badge&logo=apple&logoColor=white)
+![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
+![Bash](https://img.shields.io/badge/Bash-4EAA25?style=for-the-badge&logo=gnu-bash&logoColor=white)
 
 **OneClick Emulator Setup** is a lightning-fast, automated CLI tool designed to completely set up an Android Development environment—including the Android SDK, Command-Line Tools, Platform Tools, and an Android Virtual Device (AVD)—without the need to install the heavy 1GB+ Android Studio IDE.
 
 Developed by **Jronix-Software Solutions**.
+
+---
+
+## 🎥 Demo
+
+> *(Your demo video will go here. E.g. `![Demo](demo.gif)` or a video link)*
 
 ---
 
