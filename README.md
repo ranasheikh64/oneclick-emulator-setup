@@ -111,5 +111,7 @@ If you run into issues, ensure you have the following installed on your system:
 
 ## 👨‍💻 Credits
 
-**Developed by Jronix-Software Solutions**  
+**Developed by [Jronix-Software Solutions](https://ranasheikh64.github.io/jronix-software-solutions/)**  
 *Building powerful tools for developers.*
+
+🌐 **[Visit our Website](https://ranasheikh64.github.io/jronix-software-solutions/)**
