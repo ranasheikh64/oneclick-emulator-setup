@@ -10,9 +10,14 @@ Developed by **Jronix-Software Solutions**.
 
 - **No Android Studio Required:** Skips the massive IDE download and installs only the necessary command-line tools.
 - **Automated Licensing:** Automatically accepts all required Google SDK licenses.
-- **Smart OS Detection:** Automatically detects macOS (Intel & Apple Silicon M1/M2/M3) or Linux and downloads the optimal architecture system image (`arm64-v8a` vs `x86_64`).
-- **Modern Device Skins:** Automatically downloads and configures your emulator with modern device frames (Pixel 8 Pro, Pixel 6, Pixel 5) so it looks like a real phone.
+- **Smart OS Detection:** Automatically detects macOS, Windows (Git Bash), or Linux and downloads the optimal architecture tools and system images (e.g. `arm64-v8a` for M1/M2 Macs).
+- **Custom Naming & App Shortcuts (NEW):** Let's you give a custom name to your emulator, and generates a native Desktop App Shortcut!
+  - **macOS:** Creates a native `.app` in your Applications folder, searchable via **Spotlight** & Launchpad!
+  - **Windows:** Creates a `.bat` shortcut directly in your **Start Menu**!
+  - **Linux:** Creates a `.desktop` file searchable in your App Launcher!
+- **Modern Device Skins:** Automatically downloads and configures your emulator with modern device frames (Pixel 6 Pro, Pixel 6, Pixel 5) so it looks like a real phone.
 - **Interactive Selection & Preview:** Allows developers to choose their preferred phone frame and even preview the frames in the browser before installing!
+- **Smart Re-installation Check:** Detects if you already have emulators installed and offers to safely skip the setup process.
 
 ---
 
@@ -39,18 +44,18 @@ chmod +x android-env
 ```
 *(Follow the on-screen prompts to select your modern Pixel device frame!)*
 
-### 🪟 Windows
+### 🪟 Windows (Git Bash)
 
-Since this is a Bash script, Windows users should run this using **WSL (Windows Subsystem for Linux)** or **Git Bash**.
+Since this tool leverages bash scripts and command-line SDKs, Windows users should run this natively using **Git Bash** (which comes installed with Git for Windows).
 
-1. Open your **WSL Ubuntu** terminal (or Git Bash).
+1. Open **Git Bash**.
 2. Run the exact same commands as macOS/Linux:
    ```bash
    git clone https://github.com/ranasheikh64/oneclick-emulator-setup.git
    cd oneclick-emulator-setup
-   chmod +x android-env
    ./android-env setup
    ```
+*(Note: Do not run this in standard CMD or PowerShell. It requires Git Bash.)*
 
 ---
 
