@@ -13,7 +13,7 @@ Developed by **Jronix-Software Solutions**.
 
 ## 🎥 Demo
 
-<img height="225" alt="64249" src="https://github.com/user-attachments/assets/398f74c0-dcd7-4fa3-98dc-38a25e95fb6b" />
+<img height="400" width= "100%" alt="64249" src="https://github.com/user-attachments/assets/398f74c0-dcd7-4fa3-98dc-38a25e95fb6b" />
 
 
 ---
