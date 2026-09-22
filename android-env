@@ -72,6 +72,23 @@ function do_doctor() {
 
 function do_setup() {
     print_header
+    
+    # Check if emulator already exists
+    if command -v avdmanager &> /dev/null; then
+        EXISTING_AVDS=$(avdmanager list avd -c)
+        if [ ! -z "$EXISTING_AVDS" ]; then
+            echo -e "\n${YELLOW}Notice: You already have the following Emulators installed:${NC}"
+            echo -e "${GREEN}$EXISTING_AVDS${NC}"
+            echo "Since you already have everything set up, you may not need to install again."
+            read -p "Do you want to skip installation and exit? (y/n) [y]: " SKIP_INSTALL
+            SKIP_INSTALL=${SKIP_INSTALL:-y}
+            if [[ "$SKIP_INSTALL" == "y" || "$SKIP_INSTALL" == "Y" ]]; then
+                echo -e "Installation skipped. You can start your emulator anytime using './android-env start'"
+                return 0
+            fi
+        fi
+    fi
+
     echo -e "\nDetecting system..."
 
     # Detect OS
