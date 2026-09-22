@@ -28,9 +28,15 @@ YELLOW='\033[1;33m'
 NC='\033[0m' # No Color
 
 function print_header() {
-    echo -e "╭────────────────────────────────────╮"
-    echo -e "│       Android Dev Environment      │"
-    echo -e "╰────────────────────────────────────╯"
+    echo -e "${GREEN}╭────────────────────────────────────────────────────────╮${NC}"
+    echo -e "${GREEN}│                                                        │${NC}"
+    echo -e "${GREEN}│       🚀 Welcome to OneClick Android Emulator 🚀       │${NC}"
+    echo -e "${GREEN}│                                                        │${NC}"
+    echo -e "${GREEN}│          Developed by Jronix-Software Solutions        │${NC}"
+    echo -e "${GREEN}│      © $(date +%Y) Jronix-Software. All rights reserved.       │${NC}"
+    echo -e "${GREEN}│                                                        │${NC}"
+    echo -e "${GREEN}╰────────────────────────────────────────────────────────╯${NC}"
+    echo ""
 }
 
 function show_help() {
