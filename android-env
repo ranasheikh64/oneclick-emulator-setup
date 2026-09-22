@@ -2,9 +2,20 @@
 
 # Configuration
 VERSION="1.0.0"
-ANDROID_HOME="$HOME/Library/Android/sdk"
-if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-  ANDROID_HOME="$HOME/Android/Sdk"
+
+# Detect OS and set paths/URLs
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    OS_NAME="macOS"
+    ANDROID_HOME="$HOME/Library/Android/sdk"
+    CMD_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-mac-11076708_latest.zip"
+elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+    OS_NAME="Windows"
+    ANDROID_HOME="$HOME/AppData/Local/Android/Sdk"
+    CMD_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-win-11076708_latest.zip"
+else
+    OS_NAME="Linux"
+    ANDROID_HOME="$HOME/Android/Sdk"
+    CMD_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
 fi
 
 # Make sure tools in PATH during execution
@@ -56,26 +67,39 @@ function do_doctor() {
         echo -e "${RED}✗ ANDROID_HOME not found${NC}"
     fi
 
-    check_command "sdkmanager"
-    check_command "adb"
-    check_command "emulator"
-    check_command "avdmanager"
+    # Windows adds .bat/ .exe extensions, so we check flexibly
+    if command -v sdkmanager &> /dev/null || command -v sdkmanager.bat &> /dev/null; then
+        echo -e "${GREEN}✓ sdkmanager found${NC}"
+    else
+        echo -e "${RED}✗ sdkmanager not found${NC}"
+    fi
 
     echo -e "\n${YELLOW}Installed AVDs:${NC}"
-    if command -v avdmanager &> /dev/null; then
-        avdmanager list avd -c
+    if command -v avdmanager &> /dev/null || command -v avdmanager.bat &> /dev/null; then
+        avdmanager list avd -c 2>/dev/null || avdmanager.bat list avd -c
     else
         echo -e "${RED}avdmanager not found. Cannot list devices.${NC}"
     fi
     echo ""
 }
 
+# Set proper executable names for Windows
+if [[ "$OS_NAME" == "Windows" ]]; then
+    SDKMANAGER="sdkmanager.bat"
+    AVDMANAGER="avdmanager.bat"
+    EMULATOR="emulator.exe"
+else
+    SDKMANAGER="sdkmanager"
+    AVDMANAGER="avdmanager"
+    EMULATOR="emulator"
+fi
+
 function do_setup() {
     print_header
     
     # Check if emulator already exists
-    if command -v avdmanager &> /dev/null; then
-        EXISTING_AVDS=$(avdmanager list avd -c)
+    if command -v $AVDMANAGER &> /dev/null; then
+        EXISTING_AVDS=$($AVDMANAGER list avd -c 2>/dev/null)
         if [ ! -z "$EXISTING_AVDS" ]; then
             echo -e "\n${YELLOW}Notice: You already have the following Emulators installed:${NC}"
             echo -e "${GREEN}$EXISTING_AVDS${NC}"
@@ -90,15 +114,7 @@ function do_setup() {
     fi
 
     echo -e "\nDetecting system..."
-
-    # Detect OS
-    if [[ "$OSTYPE" == "darwin"* ]]; then
-        echo -e "${GREEN}✓ macOS detected${NC}"
-        CMD_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-mac-11076708_latest.zip"
-    else
-        echo -e "${GREEN}✓ Linux detected${NC}"
-        CMD_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-11076708_latest.zip"
-    fi
+    echo -e "${GREEN}✓ $OS_NAME detected${NC}"
 
     # Detect Architecture
     SYS_IMAGE="system-images;android-34;google_apis;x86_64"
@@ -127,10 +143,10 @@ function do_setup() {
     fi
 
     echo -e "\nAccepting SDK Licenses (Automated)..."
-    yes | sdkmanager --licenses > /dev/null 2>&1
+    yes | $SDKMANAGER --licenses > /dev/null 2>&1
 
     echo "Installing Platform Tools, Emulator, and API 34 System Image..."
-    sdkmanager "platform-tools" "platforms;android-34" "emulator" "$SYS_IMAGE"
+    $SDKMANAGER "platform-tools" "platforms;android-34" "emulator" "$SYS_IMAGE"
 
     echo -e "\nDownloading Modern Emulator Skins..."
     if [ ! -d "$ANDROID_HOME/skins/pixel_6_pro" ]; then
@@ -190,13 +206,19 @@ function do_setup() {
     fi
 
     echo -e "\nCreating Android Virtual Device ($AVD_NAME)..."
-    if avdmanager list avd -c | grep -q "$AVD_NAME"; then
+    if $AVDMANAGER list avd -c 2>/dev/null | grep -q "$AVD_NAME"; then
          echo -e "${GREEN}✓ AVD $AVD_NAME already exists${NC}"
     else
-         echo "no" | avdmanager create avd -n "$AVD_NAME" -k "$SYS_IMAGE" --device "$DEV_NAME" --force
+         echo "no" | $AVDMANAGER create avd -n "$AVD_NAME" -k "$SYS_IMAGE" --device "$DEV_NAME" --force
          
          # Apply Skin configuration
-         AVD_CONFIG="$HOME/.android/avd/$AVD_NAME.avd/config.ini"
+         # Handle Windows paths for .android folder
+         if [[ "$OS_NAME" == "Windows" ]]; then
+             AVD_CONFIG="$USERPROFILE/.android/avd/$AVD_NAME.avd/config.ini"
+         else
+             AVD_CONFIG="$HOME/.android/avd/$AVD_NAME.avd/config.ini"
+         fi
+
          if [ -f "$AVD_CONFIG" ]; then
              echo "skin.name = $SKIN_NAME" >> "$AVD_CONFIG"
              echo "skin.path = skins/$SKIN_NAME" >> "$AVD_CONFIG"
@@ -209,7 +231,7 @@ function do_setup() {
         # macOS App Shortcut (Saved in Applications for Spotlight indexing)
         mkdir -p "$HOME/Applications"
         APP_PATH="$HOME/Applications/$CUSTOM_NAME.app"
-        osacompile -e "do shell script \"$ANDROID_HOME/emulator/emulator -avd $AVD_NAME > /dev/null 2>&1 &\"" -o "$APP_PATH" > /dev/null 2>&1
+        osacompile -e "do shell script \"$ANDROID_HOME/emulator/$EMULATOR -avd $AVD_NAME > /dev/null 2>&1 &\"" -o "$APP_PATH" > /dev/null 2>&1
         echo -e "${GREEN}✓ App created at $APP_PATH (Searchable in Spotlight!)${NC}"
     elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
         # Linux Desktop Shortcut (Saved in applications folder for App Launcher)
@@ -219,7 +241,7 @@ function do_setup() {
         echo "Version=1.0" >> "$DESKTOP_FILE"
         echo "Type=Application" >> "$DESKTOP_FILE"
         echo "Name=$CUSTOM_NAME" >> "$DESKTOP_FILE"
-        echo "Exec=$ANDROID_HOME/emulator/emulator -avd $AVD_NAME" >> "$DESKTOP_FILE"
+        echo "Exec=$ANDROID_HOME/emulator/$EMULATOR -avd $AVD_NAME" >> "$DESKTOP_FILE"
         echo "Terminal=false" >> "$DESKTOP_FILE"
         chmod +x "$DESKTOP_FILE"
         echo -e "${GREEN}✓ App Shortcut created at $DESKTOP_FILE (Searchable in App Launcher!)${NC}"
@@ -243,8 +265,8 @@ function do_setup() {
 
 function do_list() {
     echo -e "${YELLOW}Available Android Virtual Devices:${NC}"
-    if command -v avdmanager &> /dev/null; then
-        avdmanager list avd -c
+    if command -v $AVDMANAGER &> /dev/null; then
+        $AVDMANAGER list avd -c
     else
         echo -e "${RED}Emulator tools not installed. Run 'android-env setup' first.${NC}"
     fi
@@ -254,7 +276,7 @@ function do_start() {
     AVD_NAME=$1
     if [ -z "$AVD_NAME" ]; then
         # Try to find a default one
-        AVD_NAME=$(avdmanager list avd -c | head -n 1)
+        AVD_NAME=$($AVDMANAGER list avd -c 2>/dev/null | head -n 1)
         if [ -z "$AVD_NAME" ]; then
             echo -e "${RED}No AVDs found. Run 'android-env setup' first.${NC}"
             exit 1
@@ -263,7 +285,7 @@ function do_start() {
     fi
     
     echo -e "Starting emulator: ${YELLOW}$AVD_NAME${NC}..."
-    nohup emulator -avd "$AVD_NAME" > /dev/null 2>&1 &
+    nohup $EMULATOR -avd "$AVD_NAME" > /dev/null 2>&1 &
     echo -e "${GREEN}✓ Emulator booting in background${NC}"
 }
 
