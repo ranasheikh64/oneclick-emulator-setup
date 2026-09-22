@@ -135,29 +135,39 @@ function do_setup() {
     while true; do
         read -p "Enter choice (1, 2, 3, or p) [1]: " AVD_CHOICE
         if [ "$AVD_CHOICE" == "p" ]; then
-            echo "Opening previews in your browser..."
+            echo "Opening direct image previews on your computer..."
             if command -v open &> /dev/null; then
-                open "https://github.com/larskristianhaga/Android-emulator-skins"
+                open "$ANDROID_HOME/skins/pixel_6_pro/back.webp" 2>/dev/null
+                open "$ANDROID_HOME/skins/pixel_6/back.webp" 2>/dev/null
+                open "$ANDROID_HOME/skins/pixel_5/back.webp" 2>/dev/null
             elif command -v xdg-open &> /dev/null; then
-                xdg-open "https://github.com/larskristianhaga/Android-emulator-skins"
-            else
-                echo "Please visit: https://github.com/larskristianhaga/Android-emulator-skins"
+                xdg-open "$ANDROID_HOME/skins/pixel_6_pro/back.webp" 2>/dev/null
+                xdg-open "$ANDROID_HOME/skins/pixel_6/back.webp" 2>/dev/null
+                xdg-open "$ANDROID_HOME/skins/pixel_5/back.webp" 2>/dev/null
             fi
+            echo -e "${GREEN}✓ Previews opened!${NC}"
         else
             break
         fi
     done
 
+    read -p "Enter a name for your Emulator (e.g. MyPixelPhone): " CUSTOM_NAME
+    if [ -z "$CUSTOM_NAME" ]; then
+        CUSTOM_NAME="My_Emulator"
+    fi
+    # Sanitize name (replace spaces with underscores)
+    CUSTOM_NAME="${CUSTOM_NAME// /_}"
+
     if [ "$AVD_CHOICE" == "2" ]; then
-        AVD_NAME="Pixel_6_API_34"
+        AVD_NAME="${CUSTOM_NAME}_API_34"
         DEV_NAME="pixel_6"
         SKIN_NAME="pixel_6"
     elif [ "$AVD_CHOICE" == "3" ]; then
-        AVD_NAME="Pixel_5_API_34"
+        AVD_NAME="${CUSTOM_NAME}_API_34"
         DEV_NAME="pixel_5"
         SKIN_NAME="pixel_5"
     else
-        AVD_NAME="Pixel_6_Pro_API_34"
+        AVD_NAME="${CUSTOM_NAME}_API_34"
         DEV_NAME="pixel_6_pro"
         SKIN_NAME="pixel_6_pro"
     fi
@@ -175,6 +185,33 @@ function do_setup() {
              echo "skin.path = skins/$SKIN_NAME" >> "$AVD_CONFIG"
          fi
          echo -e "${GREEN}✓ AVD Created with $SKIN_NAME frame!${NC}"
+    fi
+
+    echo -e "\nCreating Desktop Shortcut ($CUSTOM_NAME)..."
+    if [[ "$OSTYPE" == "darwin"* ]]; then
+        # macOS App Shortcut
+        osacompile -e "do shell script \"$ANDROID_HOME/emulator/emulator -avd $AVD_NAME > /dev/null 2>&1 &\"" -o "$HOME/Desktop/$CUSTOM_NAME.app" > /dev/null 2>&1
+        echo -e "${GREEN}✓ Desktop App created at ~/Desktop/$CUSTOM_NAME.app${NC}"
+    elif [[ "$OSTYPE" == "linux-gnu"* ]]; then
+        # Linux Desktop Shortcut
+        DESKTOP_FILE="$HOME/Desktop/$CUSTOM_NAME.desktop"
+        if [ ! -d "$HOME/Desktop" ]; then
+            DESKTOP_FILE="$HOME/.local/share/applications/$CUSTOM_NAME.desktop"
+        fi
+        echo "[Desktop Entry]" > "$DESKTOP_FILE"
+        echo "Version=1.0" >> "$DESKTOP_FILE"
+        echo "Type=Application" >> "$DESKTOP_FILE"
+        echo "Name=$CUSTOM_NAME" >> "$DESKTOP_FILE"
+        echo "Exec=$ANDROID_HOME/emulator/emulator -avd $AVD_NAME" >> "$DESKTOP_FILE"
+        echo "Terminal=false" >> "$DESKTOP_FILE"
+        chmod +x "$DESKTOP_FILE"
+        echo -e "${GREEN}✓ Desktop Shortcut created at $DESKTOP_FILE${NC}"
+    elif [[ "$OSTYPE" == "msys" || "$OSTYPE" == "cygwin" ]]; then
+        # Windows Batch Shortcut (Git Bash)
+        WIN_DESKTOP="$USERPROFILE/Desktop"
+        echo "@echo off" > "$WIN_DESKTOP/$CUSTOM_NAME.bat"
+        echo "start /B %LOCALAPPDATA%\Android\Sdk\emulator\emulator.exe -avd $AVD_NAME > NUL 2>&1" >> "$WIN_DESKTOP/$CUSTOM_NAME.bat"
+        echo -e "${GREEN}✓ Windows Batch Shortcut created on Desktop${NC}"
     fi
 
     echo -e "\n${YELLOW}Setup Complete! 🚀${NC}"
